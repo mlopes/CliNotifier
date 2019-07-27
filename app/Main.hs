@@ -13,14 +13,16 @@ main = do
   args <- getArgs
   case (fmap pack args) of
     [] -> putStrLn("Missing command to notify on.")
-    cliCommand:cliCommandParameters -> processMessage cliCommand startTime
+    cliCommand:cliCommandParameters -> processMessage cliCommand cliCommandParameters startTime
   return ()
 
-processMessage :: Text -> UTCTime -> IO ()
-processMessage cliCommand startTime = do
+processMessage :: Text -> [Text] -> UTCTime -> IO ()
+processMessage cliCommand cliCommandParameters startTime = do
   let messageDispatcher = sendMessage "https://hooks.slack.com/services/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"
+  -- Executre command here
   endTime <- getCurrentTime
   let elapsedTime = diffUTCTime endTime startTime
-  _ <- messageDispatcher $ NotificationMessage startTime endTime elapsedTime cliCommand
+  let  cmdText = intercalate " " (cliCommand:cliCommandParameters)
+  _ <- messageDispatcher $ NotificationMessage startTime endTime elapsedTime cmdText
   return ()
 
