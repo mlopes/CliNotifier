@@ -2,6 +2,7 @@
 
 module SlackService
     ( sendMessage
+    , NotificationMessage(NotificationMessage)
     , Hook
     ) where
 
@@ -14,16 +15,24 @@ import Data.Time.Clock
 
 type Hook = Text
 
-sendMessage :: Hook -> UTCTime -> UTCTime -> NominalDiffTime -> Text -> IO ()
-sendMessage hook startTime endTime elapsedTime cliCommand = do
-  messageResult <- publishMessage (Config hook) (buildMessage startTime endTime elapsedTime cliCommand)
+data NotificationMessage =
+  NotificationMessage {
+      startTime :: UTCTime
+    , endTime :: UTCTime
+    , elapsedTime :: NominalDiffTime
+    , cliCommand :: Text
+  }
+
+sendMessage :: Hook -> NotificationMessage -> IO ()
+sendMessage hook notificationMessage = do
+  messageResult <- publishMessage (Config hook) (buildMessage notificationMessage)
   case messageResult of
     Left e -> putStrLn ("An error occurred!" <> show e)
     Right _ -> return ()
 
 
-buildMessage :: UTCTime -> UTCTime -> NominalDiffTime -> Text -> Text
-buildMessage startTime endTime elapsedTime cliCommand = concat ["`", cliCommand, "` started at: ", pack $ show startTime, " finished at: ", pack $ show endTime, " ran for : ", pack $ show elapsedTime, "."]
+buildMessage :: NotificationMessage -> Text
+buildMessage m = concat ["`", cliCommand m, "` started at: ", pack $ show $ startTime m, " finished at: ", pack $ show $ endTime m, " ran for : ", pack $ show $ elapsedTime m , "."]
 
 publishMessage :: Config -> Text -> IO (Either RequestError ())
 publishMessage config text = runExceptT $ say (message text) config
