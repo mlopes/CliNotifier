@@ -38,7 +38,7 @@ publishMessage :: Config -> Text -> IO (Either RequestError ())
 publishMessage config text = runExceptT $ say (message text) config
 
 message :: Text -> Message
-message = SimpleMessage (icon) "Some Bot" channel
+message = SimpleMessage (icon) "CliNotifier" channel
 
 channel :: Channel
 channel = Channel "" ""
