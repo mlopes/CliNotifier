@@ -24,6 +24,7 @@ dependencies:
 - linklater
 - mtl
 - text
+- time
 
 default-extensions:
 - FlexibleContexts
