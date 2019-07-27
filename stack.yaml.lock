@@ -5,12 +5,12 @@
 
 packages:
 - completed:
-    hackage: linklater-4.0.0.0@sha256:c2da2304e67941abc1b0778db6da6332003d17fb10a762f23ed85ddeaaea9109,1707
+    hackage: linklater-4.0.0.2@sha256:c4d21b2ed782b6ca5fa69cdca244d60c2470cd82bf2ddd620e3e948619745609,1719
     pantry-tree:
       size: 369
-      sha256: 108722ee4990874bc82e4a68c84862810b76b30df727e3329b6afe1060ce2d1e
+      sha256: 54b9af4f1c3ff19cd98de64c7fb1ce2a98e9bf5c23654bea4c9393c3b46e6442
   original:
-    hackage: linklater-4.0.0.0
+    hackage: linklater-4.0.0.2
 snapshots:
 - completed:
     size: 500539
