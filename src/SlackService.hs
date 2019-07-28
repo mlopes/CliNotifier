@@ -4,11 +4,11 @@
 module SlackService
     ( sendMessage
     , NotificationMessage(NotificationMessage)
-    , Hook
     ) where
 
-import Prelude hiding (concat)
+import Prelude hiding (concat, putStrLn)
 import Data.Text
+import Data.Text.IO
 import Network.Linklater
 import Network.Linklater.Types
 import Control.Monad.Except
@@ -16,7 +16,7 @@ import Data.Time.Clock
 import Data.String.Interpolate ( i )
 import System.Exit
 
-type Hook = Text
+import ConfigLoader
 
 data NotificationMessage =
   NotificationMessage {
@@ -27,11 +27,12 @@ data NotificationMessage =
     , exitCode :: ExitCode
   }
 
-sendMessage :: Hook -> NotificationMessage -> IO ()
-sendMessage hook notificationMessage = do
+sendMessage :: ApplicationConfig -> NotificationMessage -> IO ()
+sendMessage (ApplicationConfig hook) notificationMessage = do
+  _ <- putStrLn(hook)
   messageResult <- publishMessage (Config hook) (buildMessage notificationMessage)
   case messageResult of
-    Left e -> putStrLn ("An error occurred!" <> show e)
+    Left e -> putStrLn ("An error occurred!" <> showText e)
     Right _ -> return ()
 
 
