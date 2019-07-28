@@ -5,6 +5,7 @@ module Main where
 import Data.Time.Clock
 import Data.Text
 import System.Environment
+import System.Process
 import SlackService
 
 main :: IO ()
@@ -20,9 +21,11 @@ processMessage :: Text -> [Text] -> UTCTime -> IO ()
 processMessage cliCommand cliCommandParameters startTime = do
   let messageDispatcher = sendMessage "https://hooks.slack.com/services/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"
   -- Executre command here
+  -- (_, Just hout, _, _) <- createProcess (proc "./test.py" []){ std_out = CreatePipe }
+  let  cmdText = intercalate " " (cliCommand:cliCommandParameters)
+  exitCode <-  system $ unpack cmdText
   endTime <- getCurrentTime
   let elapsedTime = diffUTCTime endTime startTime
-  let  cmdText = intercalate " " (cliCommand:cliCommandParameters)
   _ <- messageDispatcher $ NotificationMessage startTime endTime elapsedTime cmdText
   return ()
 
