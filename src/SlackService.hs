@@ -29,7 +29,6 @@ data NotificationMessage =
 
 sendMessage :: ApplicationConfig -> NotificationMessage -> IO ()
 sendMessage (ApplicationConfig hook) notificationMessage = do
-  _ <- putStrLn(hook)
   messageResult <- publishMessage (Config hook) (buildMessage notificationMessage)
   case messageResult of
     Left e -> putStrLn ("An error occurred!" <> showText e)
