@@ -11,6 +11,13 @@ packages:
       sha256: 54b9af4f1c3ff19cd98de64c7fb1ce2a98e9bf5c23654bea4c9393c3b46e6442
   original:
     hackage: linklater-4.0.0.2
+- completed:
+    hackage: string-interpolate-0.1.0.1@sha256:6efbc888a2986ee80ddd014fded600de113554684fe5eaca87cf02ab59cfa95c,1999
+    pantry-tree:
+      size: 614
+      sha256: cc0dd03158125caf1766efa7ad76ff53743f8fb41a4db4aff9b57f322c0dd824
+  original:
+    hackage: string-interpolate-0.1.0.1
 snapshots:
 - completed:
     size: 500539

@@ -14,18 +14,15 @@ main = do
   args <- getArgs
   case (fmap pack args) of
     [] -> putStrLn("Missing command to notify on.")
-    cliCommand:cliCommandParameters -> processMessage cliCommand cliCommandParameters startTime
+    cliCommand -> processMessage (intercalate " " cliCommand) startTime
   return ()
 
-processMessage :: Text -> [Text] -> UTCTime -> IO ()
-processMessage cliCommand cliCommandParameters startTime = do
+processMessage :: Text -> UTCTime -> IO ()
+processMessage cliCommand startTime = do
   let messageDispatcher = sendMessage "https://hooks.slack.com/services/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"
-  -- Executre command here
-  -- (_, Just hout, _, _) <- createProcess (proc "./test.py" []){ std_out = CreatePipe }
-  let  cmdText = intercalate " " (cliCommand:cliCommandParameters)
-  exitCode <-  system $ unpack cmdText
+  exitCode <-  system $ unpack cliCommand
   endTime <- getCurrentTime
   let elapsedTime = diffUTCTime endTime startTime
-  _ <- messageDispatcher $ NotificationMessage startTime endTime elapsedTime cmdText
+  _ <- messageDispatcher $ NotificationMessage startTime endTime elapsedTime cliCommand (pack $ show exitCode)
   return ()
 
