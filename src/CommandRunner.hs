@@ -12,7 +12,7 @@ import System.Exit
 
 type ErrorMessage = Text
 type Command = Text
-data Outcome = Success UTCTime UTCTime NominalDiffTime ExitCode Command | Failure ErrorMessage
+data Outcome = Success UTCTime UTCTime NominalDiffTime Command ExitCode | Failure ErrorMessage
 
 run :: [Text] -> IO Outcome
 run args = do
@@ -24,4 +24,5 @@ run args = do
       exitCode <-  system $ unpack command
       endTime <- getCurrentTime
       let elapsedTime = diffUTCTime endTime startTime
-      return $ Success startTime endTime elapsedTime exitCode command
+      return $ Success startTime endTime elapsedTime command exitCode
+

@@ -9,26 +9,28 @@ module SlackService
 import Prelude hiding (concat, putStrLn)
 import Data.Text
 import Data.Text.IO
-import Network.Linklater
-import Network.Linklater.Types
+import Network.Linklater ( Config(..), Message(..), Channel(..), Icon(..), say )
+import Network.Linklater.Types ( RequestError )
 import Control.Monad.Except
 import Data.Time.Clock
 import Data.String.Interpolate ( i )
 import System.Exit
 
-import ConfigLoader
+type Hook = Text
+type User = Text
 
 data NotificationMessage =
   NotificationMessage {
-      startTime :: UTCTime
+      user :: User
+    , startTime :: UTCTime
     , endTime :: UTCTime
     , elapsedTime :: NominalDiffTime
     , cliCommand :: Text
     , exitCode :: ExitCode
   }
 
-sendMessage :: ApplicationConfig -> NotificationMessage -> IO ()
-sendMessage (ApplicationConfig hook) notificationMessage = do
+sendMessage :: Hook -> NotificationMessage -> IO ()
+sendMessage hook notificationMessage = do
   messageResult <- publishMessage (Config hook) (buildMessage notificationMessage)
   case messageResult of
     Left e -> putStrLn ("An error occurred!" <> showText e)
@@ -37,7 +39,8 @@ sendMessage (ApplicationConfig hook) notificationMessage = do
 
 buildMessage :: NotificationMessage -> Text
 buildMessage m = intercalate "\n" [
-                      [i|command: #{cliCommand m}|]
+                      [i|#{user m} ran|]
+                    , [i|command: #{cliCommand m}|]
                     , [i|started at: #{showText $ startTime m}|]
                     , [i|finished at: #{showText $ endTime m}|]
                     , [i|ran for: #{showText $ elapsedTime m}|]
