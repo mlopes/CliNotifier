@@ -15,8 +15,9 @@ import Control.Monad.Except
 import Data.Time.Clock
 import Data.String.Interpolate ( i )
 import System.Exit
+import Data.ByteString (ByteString)
 
-type Hook = Text
+type Hook = ByteString
 type User = Text
 
 data NotificationMessage =
