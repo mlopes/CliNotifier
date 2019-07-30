@@ -24,7 +24,7 @@ main = do
     Success startTime endTime elapsedTime command exitCode -> do
       home <- getHomeDirectory
       let path = pack $ home </> (unpack ".config/CliNotifier/config")
-      config <- load path
+      config <- loadConfigFrom path
       case (config) of
         LoadingFailure e -> putStrLn $ [i|Failed to parse configuration file with error #{e}.|]
         LoadedConfig hook user -> do

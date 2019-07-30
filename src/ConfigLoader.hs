@@ -1,9 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module ConfigLoader
-    ( load
+    ( loadConfigFrom
     , LoadedConfig(LoadedConfig, LoadingFailure)
-    , Hook
     ) where
 
 import Prelude hiding (readFile)
@@ -26,8 +25,8 @@ type Hook = Text
 type User = Text
 data LoadedConfig = LoadedConfig Hook User | LoadingFailure Text
 
-load :: Text -> IO LoadedConfig
-load configPath = do
+loadConfigFrom :: Text -> IO LoadedConfig
+loadConfigFrom configPath = do
   c <- configFromFile configPath
   return (case (c) of
       Left e -> LoadingFailure $ pack $ Y.prettyPrintParseException e
