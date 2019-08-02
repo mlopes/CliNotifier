@@ -17,6 +17,8 @@ import Data.String.Interpolate ( i )
 import System.Exit
 import Data.ByteString (ByteString)
 
+import Http.SlackClient
+
 type Hook = ByteString
 type User = Text
 
@@ -31,11 +33,11 @@ data NotificationMessage =
   }
 
 sendMessage :: Hook -> NotificationMessage -> IO ()
-sendMessage hook notificationMessage = do
-  messageResult <- publishMessage (Config hook) (buildMessage notificationMessage)
-  case messageResult of
-    Left e -> putStrLn ("An error occurred!" <> showText e)
-    Right _ -> return ()
+sendMessage hook notificationMessage = notify hook
+--  messageResult <- publishMessage (Config hook) (buildMessage notificationMessage)
+--  case messageResult of
+--    Left e -> putStrLn ("An error occurred!" <> showText e)
+--   Right _ -> return ()
 
 
 buildMessage :: NotificationMessage -> Text
