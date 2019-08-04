@@ -8,20 +8,25 @@ module ConfigLoader
 import Prelude hiding (readFile)
 import Data.Text
 import Data.Text.IO
+import Data.Text.Encoding
+import Data.ByteString (ByteString)
 import qualified Data.Yaml as Y
-import Data.Yaml (FromJSON(..), (.:), withObject)
+import Data.Yaml (FromJSON(..), (.:))
 
 data ConfigFormat  = ConfigFormat {
     user :: Text
-  , hook :: Text
+  , hook :: ByteString
 } deriving Show
 
+instance FromJSON ByteString where
+  parseJSON = Y.withText "ByteString" $ pure . encodeUtf8
+
 instance FromJSON ConfigFormat where
-  parseJSON = withObject "ConfigFormat" $ \v -> ConfigFormat
+  parseJSON = Y.withObject "ConfigFormat" $ \v -> ConfigFormat
     <$> v .: "user"
     <*> v .: "hook"
 
-type Hook = Text
+type Hook = ByteString
 type User = Text
 data LoadedConfig = LoadedConfig Hook User | LoadingFailure Text
 

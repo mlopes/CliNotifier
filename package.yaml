@@ -30,6 +30,9 @@ dependencies:
 - directory
 - filepath
 - yaml
+- req
+- bytestring
+- aeson
 
 default-extensions:
 - FlexibleContexts
