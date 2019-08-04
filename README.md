@@ -27,8 +27,7 @@ To get the slack member ID, you need to click the icon with the three vertical d
 
 ## Current Caveats
 
-- Currently, it only supports a single configuration file in the user's home folder
-- Different colours for failure states are not yet implemented
+- Currently, it only supports a single configuration file in the user's home folder at `~/.config/CliNotifier/config`
 
 ## Development
 
