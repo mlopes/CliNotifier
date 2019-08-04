@@ -11,9 +11,10 @@ import System.Environment
 import System.Directory
 import System.FilePath
 
-import SlackService
+import Http.SlackClient
 import CommandRunner
 import ConfigLoader
+import NotificationMessage (NotificationMessage(NotificationMessage))
 
 main :: IO ()
 main = do
@@ -28,7 +29,7 @@ main = do
       case (config) of
         LoadingFailure e -> putStrLn $ [i|Failed to parse configuration file with error #{e}.|]
         LoadedConfig hook user -> do
-          let messageDispatcher = sendMessage hook
+          let messageDispatcher = notify hook
           dispatchResult <- messageDispatcher $ NotificationMessage user startTime endTime elapsedTime command exitCode
           return dispatchResult
 

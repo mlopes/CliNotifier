@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 module Http.SlackClient
   ( notify
@@ -9,65 +10,59 @@ import Data.Text
 import Data.Aeson
 import Data.ByteString (ByteString)
 import Data.Functor
+import Data.Time.Clock
+import System.Exit
+import Data.String.Interpolate ( i )
 
-notify :: ByteString -> IO ()
-notify hook = call $ parseUrlHttps hook
+import NotificationMessage
 
-call :: Maybe (Url a, Option b) -> IO ()
-call Nothing = pure ()
-call (Just u)  = do
-  _ <- print (encode buildPayload)
-  r <- (runReq defaultHttpConfig (request $ fst u)) <&> (\_ -> ())
+notify :: ByteString -> NotificationMessage -> IO ()
+notify hook message = call (parseUrlHttps hook) (ReqBodyJson $ buildPayload message)
+
+call :: ToJSON r => Maybe (Url a, Option b) -> ReqBodyJson r -> IO ()
+call Nothing _ = pure ()
+call (Just u) reqBody  = do
+  let url = fst u
+  r <- (runReq defaultHttpConfig (request url reqBody)) <&> (\_ -> ())
   return r
 
-request :: Url s -> Req IgnoreResponse
-request url = req
+request :: ToJSON a => Url s -> ReqBodyJson a -> Req IgnoreResponse
+request url reqBodyJson = req
   POST
   url
-  (ReqBodyJson buildPayload)
+  reqBodyJson
   ignoreResponse
   mempty
 
 
-buildPayload :: Value
-buildPayload = object [ "attachments" .= [ object [ "fallback" .= ("Finished running command." :: Text) , "color" .= ("#36a64f" :: Text) , "pretext" .= ("Finished running command triggered by <@ULFRW43KM>" :: Text) , "title" .= ("Command Execution Details" :: Text) , "text" .= ("./test.py" :: Text) , "fields" .= [ object [ "title" .= ("Started At" :: Text), "value" .= ("2019-07-30 10:58:02.623789 UTC" :: Text), "short" .= (False :: Bool) ] , object [ "title" .= ("Finished At" :: Text), "value" .= ("2019-07-30 10:58:07.702223 UTC" :: Text), "short" .= (False :: Bool) ] , object [ "title" .= ("Duration" :: Text), "value" .= ("5.078434s" :: Text), "short" .= (False :: Bool) ] , object [ "title" .= ("Exit Code" :: Text), "value" .= ("ExitSuccess" :: Text), "short" .= (False :: Bool) ] ] ] ] ]
-  --object [
-    --"type" .= ("section" :: Text)
-    --, "text" .= object [ "type" .= ("mrkdwn" :: Text) , "text" .= ("*Finished running command triggered by <@ULFRW43KM>*" :: Text) ] ] , object [ "type" .= ("divider" :: Text) ] , object [ "type" .= ("section" :: Text) , "text" .= object [ "type" .= ("mrkdwn" :: Text) , "text" .= ("*Command:*.\\test.py\n*Started At:* 2019-07-30 10:58:02.623789 UTC\n*Finished At:* 2019-07-30 10:58:07.702223 UTC\n*Duration:* 5.078434s\n*Exit Code:* ExitSuccess" :: Text) ] , "accessory" .= object [ "type" .= ("image" :: Text) , "image_url" .= ("https://api.slack.com/img/blocks/bkb_template_images/approvalsNewDevice.png" :: Text) , "alt_text" .= ("computer thumbnail" :: Text) ] ] ]
+buildPayload :: NotificationMessage -> Value
+buildPayload message = object [
+  "attachments" .= (attachments message) ]
 
-{-
-{
-    "attachments": [
-        {
-            "fallback": "Finished running command.",
-            "color": "#36a64f",
-            "pretext": "Finished running command triggered by <@ULFRW43KM>",
-            "title": "Command Execution Details",
-            "text": "./test.py",
-            "fields": [
-                {
-                    "title": "Started At",
-                    "value": "2019-07-30 10:58:02.623789 UTC",
-                    "short": false
-                },
-				{
-					"title": "Finished At",
-                    "value": "2019-07-30 10:58:07.702223 UTC",
-                    "short": false
-				},
-				{
-					"title": "Duration",
-					"value": "5.078434s",
-                    "short": false
-				},
-				{
-					"title": "Exit Code",
-					"value": "ExitSuccess",
-                    "short": false
-				}
-            ]
-        }
-    ]
-}
--}
+attachments :: NotificationMessage -> [Value]
+attachments message = [
+  object [
+    "fallback" .= ("Finished running command." :: Text)
+    , "color" .= ("#36a64f" :: Text)
+    , "pretext" .= ([i|Finished running command triggered by <#{user message}>|] :: Text)
+    , "title" .= ("Command Execution Details" :: Text)
+    , "text" .= (cliCommand message :: Text)
+    , "fields" .= (fields (startTime message) (endTime message) (elapsedTime message) (exitCode message)) ]]
+
+fields :: UTCTime -> UTCTime -> NominalDiffTime -> ExitCode ->  [Value]
+fields startTime endTime duration exitCode = [
+  (field "Started At" startTime)
+  , (field "Finished At" endTime)
+  , (field "Duration" duration)
+  , (field "Exit Code" exitCode)]
+
+field :: ToJSON a => Text -> a -> Value
+field title value = object [ "title" .= title, "value" .= value, "short" .= False]
+
+instance ToJSON ExitCode where
+  toJSON = String . showText
+
+showText :: Show a => a -> Text
+showText = pack . show
+
 
