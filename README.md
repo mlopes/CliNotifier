@@ -29,3 +29,45 @@ To get the slack member ID, you need to click the icon with the three vertical d
 
 - Currently, it only supports a single configuration file in the user's home folder
 - Different colours for failure states are not yet implemented
+
+## Development
+
+The current implementation uses the JSON format seen in the following example:
+
+```
+{
+    "attachments": [
+        {
+            "fallback": "Finished running command.",
+            "color": "#36a64f",
+            "pretext": "Finished running command triggered by <@ULFRW43KM>",
+            "title": "Command Execution Details",
+            "text": "./test.py",
+            "fields": [
+                {
+                    "title": "Started At",
+                    "value": "2019-07-30 10:58:02.623789 UTC",
+                    "short": false
+                },
+                {
+                    "title": "Finished At",
+                    "value": "2019-07-30 10:58:07.702223 UTC",
+                    "short": false
+                },
+                {
+                    "title": "Duration",
+                    "value": "5.078434s",
+                    "short": false
+                },
+                {
+                    "title": "Exit Code",
+                    "value": "ExitSuccess",
+                    "short": false
+                }
+            ]
+        }
+    ]
+}
+```
+
+The JSON was build using Slack's provided tool [message builder](https://api.slack.com/docs/messages/builder), as the newer block kit generated format is not supported by webhooks.
