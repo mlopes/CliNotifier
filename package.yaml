@@ -21,7 +21,6 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- linklater
 - mtl
 - text
 - time
@@ -33,9 +32,6 @@ dependencies:
 - req
 - bytestring
 - aeson
-
-default-extensions:
-- FlexibleContexts
 
 library:
   source-dirs: src

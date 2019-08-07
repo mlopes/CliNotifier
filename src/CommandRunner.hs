@@ -5,6 +5,7 @@ module CommandRunner
     , Outcome(Failure, Success)
     ) where
 
+import Prelude hiding (unwords)
 import Data.Text
 import Data.Time.Clock
 import System.Process
@@ -17,10 +18,10 @@ data Outcome = Success UTCTime UTCTime NominalDiffTime Command ExitCode | Failur
 run :: [Text] -> IO Outcome
 run args = do
   startTime <- getCurrentTime
-  case (args) of
+  case args of
     [] -> return $ Failure "You need to specify a command to run"
     argList -> do
-      let command = intercalate " " argList
+      let command = unwords argList
       exitCode <-  system $ unpack command
       endTime <- getCurrentTime
       let elapsedTime = diffUTCTime endTime startTime

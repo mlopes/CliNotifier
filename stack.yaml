@@ -36,7 +36,6 @@ packages:
 # forks / in-progress versions pinned to a git hash. For example:
 #
 extra-deps:
-- linklater-4.0.0.2
 - string-interpolate-0.1.0.1
 - req-2.1.0
 - retry-0.8.0.1@sha256:149393f74ce7504e171d71046936e58841ccfa0e59a37809824b6d68c04a36e5,2207

@@ -33,7 +33,7 @@ data LoadedConfig = LoadedConfig Hook User | LoadingFailure Text
 loadConfigFrom :: Text -> IO LoadedConfig
 loadConfigFrom configPath = do
   c <- configFromFile configPath
-  return (case (c) of
+  return (case c of
       Left e -> LoadingFailure $ pack $ Y.prettyPrintParseException e
       Right config -> LoadedConfig (hook config) (user config))
 

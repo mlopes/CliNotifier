@@ -21,10 +21,9 @@ notify hook message = call (parseUrlHttps hook) (ReqBodyJson $ buildPayload mess
 
 call :: ToJSON r => Maybe (Url a, Option b) -> ReqBodyJson r -> IO ()
 call Nothing _ = pure ()
-call (Just u) reqBody  = do
-  let url = fst u
-  r <- (runReq defaultHttpConfig (request url reqBody)) <&> (\_ -> ())
-  return r
+call (Just u) reqBody  =
+  do let url = fst u
+     runReq defaultHttpConfig (request url reqBody) <&> const ()
 
 request :: ToJSON a => Url s -> ReqBodyJson a -> Req IgnoreResponse
 request url reqBodyJson = req
@@ -37,24 +36,24 @@ request url reqBodyJson = req
 
 buildPayload :: NotificationMessage -> Value
 buildPayload message = object [
-  "attachments" .= (attachments message) ]
+  "attachments" .= attachments message ]
 
 attachments :: NotificationMessage -> [Value]
 attachments message = [
   object [
     "fallback" .= ("Finished running command." :: Text)
-    , "color" .= (colour $ exitCode message)
+    , "color" .= colour (exitCode message)
     , "pretext" .= ([i|Finished running command triggered by <#{user message}>|] :: Text)
     , "title" .= ("Command Execution Details" :: Text)
     , "text" .= (cliCommand message :: Text)
-    , "fields" .= (fields (startTime message) (endTime message) (elapsedTime message) (exitCode message)) ]]
+    , "fields" .= fields (startTime message) (endTime message) (elapsedTime message) (exitCode message) ]]
 
 fields :: UTCTime -> UTCTime -> NominalDiffTime -> ExitCode ->  [Value]
 fields startTime endTime duration exitCode = [
-  (field "Started At" startTime)
-  , (field "Finished At" endTime)
-  , (field "Duration" duration)
-  , (field "Exit Code" exitCode)]
+    field "Started At" startTime
+  , field "Finished At" endTime
+  , field "Duration" duration
+  , field "Exit Code" exitCode]
 
 field :: ToJSON a => Text -> a -> Value
 field title value = object [ "title" .= title, "value" .= value, "short" .= False]

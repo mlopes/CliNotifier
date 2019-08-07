@@ -24,12 +24,11 @@ main = do
     Failure errorMessage -> putStrLn errorMessage
     Success startTime endTime elapsedTime command exitCode -> do
       home <- getHomeDirectory
-      let path = pack $ home </> (unpack ".config/CliNotifier/config")
+      let path = pack $ home </> unpack ".config/CliNotifier/config"
       config <- loadConfigFrom path
-      case (config) of
-        LoadingFailure e -> putStrLn $ [i|Failed to parse configuration file with error #{e}.|]
+      case config of
+        LoadingFailure e -> putStrLn [i|Failed to parse configuration file with error #{e}.|]
         LoadedConfig hook user -> do
           let messageDispatcher = notify hook
-          dispatchResult <- messageDispatcher $ NotificationMessage user startTime endTime elapsedTime command exitCode
-          return dispatchResult
+          messageDispatcher $ NotificationMessage user startTime endTime elapsedTime command exitCode
 
