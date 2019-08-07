@@ -23,7 +23,7 @@ call :: ToJSON r => Maybe (Url a, Option b) -> ReqBodyJson r -> IO ()
 call Nothing _ = pure ()
 call (Just u) reqBody  =
   do let url = fst u
-     runReq defaultHttpConfig (request url reqBody) <&> const ()
+     runReq defaultHttpConfig (request url reqBody) $> ()
 
 request :: ToJSON a => Url s -> ReqBodyJson a -> Req IgnoreResponse
 request url reqBodyJson = req
