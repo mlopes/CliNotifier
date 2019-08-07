@@ -3,17 +3,17 @@
 
 module Main where
 
-import Prelude hiding (putStrLn)
+import Data.String.Interpolate (i)
 import Data.Text
 import Data.Text.IO
-import Data.String.Interpolate ( i )
-import System.Environment
+import Prelude hiding (putStrLn)
 import System.Directory
+import System.Environment
 import System.FilePath
 
-import Http.SlackClient
 import CommandRunner
 import ConfigLoader
+import Http.SlackClient
 import NotificationMessage (NotificationMessage(NotificationMessage))
 
 main :: IO ()
@@ -27,8 +27,15 @@ main = do
       let path = pack $ home </> unpack ".config/CliNotifier/config"
       config <- loadConfigFrom path
       case config of
-        LoadingFailure e -> putStrLn [i|Failed to parse configuration file with error #{e}.|]
+        LoadingFailure e ->
+          putStrLn [i|Failed to parse configuration file with error #{e}.|]
         LoadedConfig hook user -> do
           let messageDispatcher = notify hook
-          messageDispatcher $ NotificationMessage user startTime endTime elapsedTime command exitCode
-
+          messageDispatcher $
+            NotificationMessage
+              user
+              startTime
+              endTime
+              elapsedTime
+              command
+              exitCode
